@@ -7,7 +7,7 @@ WORKDIR /app
 # Copy the entire project context to the builder image
 COPY . .
 
-# Ensure start.sh is executable early in the builder stage
+# Ensure start.sh is executable in the builder stage (for any builder operations)
 RUN chmod +x start.sh
 
 # Create pb_data and pb_public directories
@@ -27,6 +27,7 @@ WORKDIR /app
 # Copy the PocketBase executable, start.sh, and data/public directories
 COPY --from=builder /app/pocketbase .
 COPY --from=builder /app/start.sh .
+**RUN chmod +x start.sh # Add this line here to ensure executability in the final image**
 COPY --from=builder /app/pb_data ./pb_data
 COPY --from=builder /app/pb_public ./pb_public
 
@@ -35,12 +36,6 @@ EXPOSE 8090
 
 # Command to run your start.sh script
 CMD ["./start.sh"]
-
-
-
-
-
-
 
 
 
