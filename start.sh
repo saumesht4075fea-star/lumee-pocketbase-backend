@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# --- Start of final debugging start.sh ---
+# --- Final start.sh for production deployment ---
 
 # 1. Define PocketBase version and executable name
 PB_VERSION="0.36.8"
@@ -57,21 +57,27 @@ echo "Step 6: Ensuring pb_data and pb_migrations directories exist..."
 mkdir -p pb_data
 mkdir -p pb_migrations
 
-# 7. TEMPORARY PASSWORD RESET COMMAND
+# 7. PASSWORD RESET COMMAND (USING 'superuser' instead of 'admin')
 # YOU MUST REPLACE MyStrongPass123! your actual new password!
-echo "Step 7: Attempting to reset PocketBase admin password with saumesht4075fea@gmail.com..."
+echo "Step 7: Attempting to reset PocketBase superuser password with saumesht4075fea@gmail.com..."
 
-# Check if the 'admin' command is even available in the downloaded binary
-if "./$PB_EXE" --help | grep -q "admin"; then
-    echo "PocketBase binary supports 'admin' command. Proceeding with reset."
-    "./$PB_EXE" admin reset-password --email saumesht4075fea@gmail.com --password MyStrongPass123!
-    echo "Password reset command executed. This deployment is expected to exit early."
+# Check if the 'superuser' command is available (for robustness, though we know it is for 0.36.8)
+if "./$PB_EXE" --help | grep -q "superuser"; then
+    echo "PocketBase binary supports 'superuser' command. Proceeding with reset."
+    "./$PB_EXE" superuser reset-password --email saumesht4075fea@gmail.com --password MyStrongPass123!
+    echo "Password reset command executed."
+    # We remove the exit 1 here as the reset should now work.
+    # The container can continue to run PocketBase in the next step.
 else
-    echo "ERROR: Downloaded PocketBase binary does NOT support 'admin' command. This is highly unexpected. Full --help output from '$PB_EXE --help':"
+    echo "ERROR: Downloaded PocketBase binary does NOT support 'superuser' command. This is unexpected for v0.36.8. Full --help output from '$PB_EXE --help':"
     "./$PB_EXE" --help
     echo "Also checking version via '$PB_EXE --version':"
     "./$PB_EXE" --version
-    exit 1 # Exit with an error to highlight the problem
+    exit 1 # Exit with an error if for some reason 'superuser' is missing
 fi
 
-# --- End of final debugging start.sh ---
+# 8. Start PocketBase (assuming password reset is done)
+echo "Step 8: Starting PocketBase server..."
+exec "./$PB_EXE" serve --http "0.0.0.0:$PORT" --dir "pb_data"
+
+# --- End of final start.sh for production deployment ---
