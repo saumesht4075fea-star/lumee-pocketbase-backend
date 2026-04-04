@@ -18,5 +18,10 @@ chmod +x pocketbase
 mkdir -p pb_data
 mkdir -p pb_migrations
 
-# 4. Start PocketBase server
-./pocketbase serve --http 0.0.0.0:${PORT} --automigrate
+# !!! TEMPORARY PASSWORD RESET COMMAND !!!
+# IMPORTANT: REPLACE THIS ENTIRE PLACEHOLDER WITH YOUR ACTUAL NEW STRONG PASSWORD!
+./pocketbase admin reset-password --email saumesht4075fea@gmail.com --password passworD_1234
+
+# This temporary script will likely run the command and then exit.
+# This is expected. Once the password is reset, you MUST revert this file
+# to its original 'serve' command and push again.
