@@ -1,36 +1,40 @@
 #!/bin/bash
 
-# --- Start of updated start.sh ---
+# --- Start of new simplified start.sh ---
 
-# 1. Define PocketBase version and download URL
+# 1. Define PocketBase version and executable name
 PB_VERSION="0.36.8"
-PB_DOWNLOAD_URL="https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_amd64.zip"
-PB_ZIP_FILE="pocketbase_${PB_VERSION}_linux_amd64.zip"
 PB_EXE="pocketbase"
 
-# 2. Download PocketBase if it doesn't exist or is the wrong version
-if [ ! -f "$PB_EXE" ] || [ "$(./$PB_EXE version)" != "$PB_VERSION" ]; then
-    echo "Downloading PocketBase v$PB_VERSION..."
-    wget -q "$PB_DOWNLOAD_URL"
-    unzip -q "$PB_ZIP_FILE"
-    rm "$PB_ZIP_FILE"
-    chmod +x "$PB_EXE" # Make executable right after download
-else
-    echo "PocketBase v$PB_VERSION already present and correct."
-fi
+# 2. Remove any existing PocketBase executable to force a fresh download
+echo "Ensuring no old PocketBase executable is present..."
+rm -f "$PB_EXE"
 
-# 3. Ensure necessary directories exist (these should be persistent if using Render's disk)
+# 3. Download PocketBase (ensuring correct URL and filename)
+echo "Downloading PocketBase v$PB_VERSION..."
+wget -q "https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_amd64.zip" -O pb.zip
+unzip -q pb.zip
+rm pb.zip # Clean up the zip file
+
+# 4. Make the downloaded executable runnable
+chmod +x "$PB_EXE"
+
+# 5. Ensure necessary directories exist
 mkdir -p pb_data
 mkdir -p pb_migrations
 
-# 4. TEMPORARY PASSWORD RESET COMMAND
+# 6. TEMPORARY PASSWORD RESET COMMAND
 # YOU MUST REPLACE 'YOUR_NEW_STRONG_PASSWORD_HERE' with your actual new password!
-echo "Attempting to reset PocketBase admin password..."
-./$PB_EXE admin reset-password --email saumesht4075fea@gmail.com --password YOUR_NEW_STRONG_PASSWORD_HERE
+echo "Attempting to reset PocketBase admin password with saumesht4075fea@gmail.com..."
+# Check if the 'admin' command is even available in the downloaded binary
+if "./$PB_EXE" --help | grep -q "admin"; then
+    echo "PocketBase binary supports 'admin' command. Proceeding with reset."
+    "./$PB_EXE" admin reset-password --email saumesht4075fea@gmail.com --password YOUR_NEW_STRONG_PASSWORD_HERE
+else
+    echo "ERROR: Downloaded PocketBase binary does NOT support 'admin' command. This is unexpected."
+    exit 1 # Exit with an error to highlight the problem
+fi
 
-# This temporary script will likely run the command and then exit.
-# This is expected behavior for the password reset step.
-# Once the password is reset, you MUST revert this file
-# to its original 'serve' command and push again for normal operation.
+echo "Password reset command executed. This deployment is expected to exit early."
 
-# --- End of updated start.sh ---
+# --- End of new simplified start.sh ---
