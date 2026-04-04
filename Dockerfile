@@ -35,4 +35,4 @@ COPY --from=builder /app/pb_public ./pb_public
 EXPOSE $PORT
 
 # Define the command to run when the container starts
-CMD ["./start.sh"]
+CMD ["/bin/sh", "./start.sh"]
