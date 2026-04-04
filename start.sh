@@ -1,3 +1,45 @@
+#!/bin/bash
+
+# --- Start of final debugging start.sh ---
+# --- Final start.sh for production deployment ---
+
+# 1. Define PocketBase version and executable name
+PB_VERSION="0.36.8"
+PB_ARCH="linux_amd64"
+PB_EXE="pocketbase" # The name of the executable
+
+echo "Starting PocketBase setup process for version $PB_VERSION and architecture $PB_ARCH."
+
+# 2. Ensure no old PocketBase executable is present
+echo "Step 2: Ensuring no old PocketBase executable is present..."
+rm -f "$PB_EXE"
+
+# 3. Download PocketBase from GitHub
+echo "Step 3: Downloading PocketBase v$PB_VERSION from GitHub..."
+PB_URL="https://github.com/pocketbase/pocketbase/releases/download/v$PB_VERSION/pocketbase_${PB_VERSION}_${PB_ARCH}.zip"
+echo "Downloading from: $PB_URL"
+curl -sL "$PB_URL" -o pb.zip
+echo "Downloaded pb.zip. Size:"
+ls -lh pb.zip
+
+# 4. Unzip pb.zip into current directory
+echo "Step 4: Unzipping pb.zip into current directory..."
+unzip pb.zip
+echo "Unzipped files. Contents after unzip:"
+ls -lh
+
+# 5. Make PocketBase executable
+# This is crucial! Let's ensure it has execute permissions right before we use it.
+echo "Step 5: Making PocketBase executable..."
+**chmod +x "$PB_EXE"**
+echo "Permissions after chmod:"
+ls -lh "$PB_EXE"
+
+# 6. Ensuring pb_data and pb_migrations directories exist
+echo "Step 6: Ensuring pb_data and pb_migrations directories exist..."
+mkdir -p pb_data
+mkdir -p pb_migrations
+
 # 7. PASSWORD RESET COMMAND (USING 'superuser' upsert)
 # The password will be set to MyStrongPass123!
 echo "Step 7: Attempting to create/upsert PocketBase superuser with saumesht4075fea@gmail.com..."
@@ -15,6 +57,8 @@ else
     exit 1 # Exit with an error if for some reason 'superuser' is missing
 fi
 
+# --- End of final debugging start.sh ---
 # 8. Start PocketBase (assuming superuser upsert is done)
 echo "Step 8: Starting PocketBase server..."
 exec "./$PB_EXE" serve --http "0.0.0.0:$PORT" --dir "pb_data"
+# --- End of final start.sh for production deployment --
