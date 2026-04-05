@@ -60,5 +60,5 @@ fi
 # --- End of final debugging start.sh ---
 # 8. Start PocketBase (assuming superuser upsert is done)
 echo "Step 8: Starting PocketBase server..."
-exec "./$PB_EXE" serve --http "0.0.0.0:$PORT" --dir "pb_data"
+exec "./$PB_EXE" serve --httpp://127.0.0.1:8090/_/ --dir "pb_data"
 # --- End of final start.sh for production deployment --
