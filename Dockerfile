@@ -15,4 +15,4 @@ WORKDIR /pb
 
 EXPOSE 10000
 
-CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:10000", "--dir=/pb/pb_data", "--log=/pb/pb_data/pb.log"]
+CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:10000", "--dir=/pb/pb_data"]
