@@ -1,16 +1,18 @@
 FROM alpine:latest
 
-ARG PB_VERSION=0.25.1  # use latest from https://pocketbase.io/docs/
+ARG PB_VERSION=0.25.1
 
 RUN apk add --no-cache unzip ca-certificates \
   && wget -q https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_amd64.zip \
-  && unzip pocketbase_${PB_VERSION}_linux_amd64.zip \
+  && unzip pocketbase_${PB_VERSION}_linux_amd64.zip -d /pb/ \
   && rm pocketbase_${PB_VERSION}_linux_amd64.zip \
-  && chmod +x /pocketbase
+  && chmod +x /pb/pocketbase
 
-# Optional: COPY pb_migrations /pocketbase/pb_migrations
-# Optional: COPY pb_hooks /pocketbase/pb_hooks
+# Create data and migrations dirs (empty OK)
+RUN mkdir -p /pb/pb_data /pb/pb_migrations /pb/pb_hooks
 
-EXPOSE 8080
+WORKDIR /pb
 
-CMD ["/pocketbase", "serve", "--http=0.0.0.0:10000", "--dir=/pocketbase/pb_data"]
+EXPOSE 10000
+
+CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:10000", "--dir=/pb/pb_data", "--log=/pb/pb_data/pb.log"]
